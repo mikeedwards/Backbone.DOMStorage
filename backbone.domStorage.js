@@ -77,7 +77,10 @@ _.extend(Backbone.LocalStorage.prototype, {
   // Return the array of all models currently in storage.
   findAll: function() {
     return _(this.records).chain()
-        .map(function(id){return JSON.parse(this.safeGet(this.name+"-"+id));}, this)
+        .map(function(id){
+          var obj = JSON.parse(this.safeGet(this.name+"-"+id));
+          return _.isEmpty(obj) ? false : obj;
+        }, this)
         .compact()
         .value();
   },
@@ -141,7 +144,7 @@ Backbone.LocalStorage.sync = window.Store.sync = Backbone.localSync = function(m
 // window.Store is deprectated, use Backbone.SessionStorage instead
 Backbone.SessionStorage = window.SessionStore = function(name) {
   this.name = name;
-  var store = this.sessionStorage().getItem(this.name);
+  var store = this.sessionStorage().getItem(this.name) || "";
   this.records = (store && store.split(",")) || [];
 };
 
@@ -155,7 +158,7 @@ _.extend(Backbone.SessionStorage.prototype, {
   // Fetches an item from local storage and returns an empty object if it doesn't exist
   // cf. https://github.com/leaguevine/leaguevine-ultistats/commit/056e01512083fb27d5a4d67c4c733e0f57fc59ff
   safeGet: function(name) { 
-    var obj = this.localStorage().getItem(name); 
+    var obj = this.sessionStorage().getItem(name); 
     if (!obj) {
       return '{}';
     }
@@ -190,7 +193,10 @@ _.extend(Backbone.SessionStorage.prototype, {
   // Return the array of all models currently in storage.
   findAll: function() {
     return _(this.records).chain()
-        .map(function(id){return JSON.parse(this.safeGet(this.name+"-"+id));}, this)
+        .map(function(id){
+          var obj = JSON.parse(this.safeGet(this.name+"-"+id));
+          return _.isEmpty(obj) ? false : obj;
+        }, this)
         .compact()
         .value();
   },
