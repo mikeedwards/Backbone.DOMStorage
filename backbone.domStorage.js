@@ -28,7 +28,7 @@ function guid() {
 // window.Store is deprectated, use Backbone.LocalStorage instead
 Backbone.LocalStorage = window.Store = function(name) {
   this.name = name;
-  var store = this.localStorage().getItem(this.name);
+  var store = this.localStorage().getItem(this.name) || "";
   this.records = (store && store.split(",")) || [];
 };
 
@@ -37,6 +37,16 @@ _.extend(Backbone.LocalStorage.prototype, {
   // Save the current state of the **Store** to *localStorage*.
   save: function() {
     this.localStorage().setItem(this.name, this.records.join(","));
+  },
+
+  // Fetches an item from local storage and returns an empty object if it doesn't exist
+  // cf. https://github.com/leaguevine/leaguevine-ultistats/commit/056e01512083fb27d5a4d67c4c733e0f57fc59ff
+  safeGet: function(name) { 
+    var obj = this.localStorage().getItem(name); 
+    if (!obj) {
+      return '{}';
+    }
+    return obj;
   },
 
   // Add a model, giving it a (hopefully)-unique GUID, if it doesn't already
@@ -61,13 +71,13 @@ _.extend(Backbone.LocalStorage.prototype, {
 
   // Retrieve a model from `this.data` by id.
   find: function(model) {
-    return JSON.parse(this.localStorage().getItem(this.name+"-"+model.id));
+    return JSON.parse(this.safeGet(this.name+"-"+model.id));
   },
 
   // Return the array of all models currently in storage.
   findAll: function() {
     return _(this.records).chain()
-        .map(function(id){return JSON.parse(this.localStorage().getItem(this.name+"-"+id));}, this)
+        .map(function(id){return JSON.parse(this.safeGet(this.name+"-"+id));}, this)
         .compact()
         .value();
   },
@@ -81,7 +91,7 @@ _.extend(Backbone.LocalStorage.prototype, {
   },
 
   localStorage: function() {
-      return localStorage;
+    return localStorage;
   }
 
 });
@@ -142,6 +152,16 @@ _.extend(Backbone.SessionStorage.prototype, {
     this.sessionStorage().setItem(this.name, this.records.join(","));
   },
 
+  // Fetches an item from local storage and returns an empty object if it doesn't exist
+  // cf. https://github.com/leaguevine/leaguevine-ultistats/commit/056e01512083fb27d5a4d67c4c733e0f57fc59ff
+  safeGet: function(name) { 
+    var obj = this.localStorage().getItem(name); 
+    if (!obj) {
+      return '{}';
+    }
+    return obj;
+  },
+
   // Add a model, giving it a (hopefully)-unique GUID, if it doesn't already
   // have an id of it's own.
   create: function(model) {
@@ -164,13 +184,13 @@ _.extend(Backbone.SessionStorage.prototype, {
 
   // Retrieve a model from `this.data` by id.
   find: function(model) {
-    return JSON.parse(this.sessionStorage().getItem(this.name+"-"+model.id));
+    return JSON.parse(this.safeGet(this.name+"-"+model.id));
   },
 
   // Return the array of all models currently in storage.
   findAll: function() {
     return _(this.records).chain()
-        .map(function(id){return JSON.parse(this.sessionStorage().getItem(this.name+"-"+id));}, this)
+        .map(function(id){return JSON.parse(this.safeGet(this.name+"-"+id));}, this)
         .compact()
         .value();
   },
@@ -184,7 +204,7 @@ _.extend(Backbone.SessionStorage.prototype, {
   },
 
   sessionStorage: function() {
-      return sessionStorage;
+    return sessionStorage;
   }
 
 });
@@ -221,22 +241,22 @@ Backbone.SessionStorage.sync = Backbone.sessionSync = function(method, model, op
 Backbone.ajaxSync = Backbone.sync;
 
 Backbone.getSyncMethod = function(model) {
-	if(model.localStorage || (model.collection && model.collection.localStorage))
-	{
-		return Backbone.localSync;
-	}
+  if(model.localStorage || (model.collection && model.collection.localStorage))
+  {
+    return Backbone.localSync;
+  }
   if(model.sessionStorage || (model.collection && model.collection.sessionStorage))
   {
     return Backbone.SessionStorage.sync;
   }
 
-	return Backbone.ajaxSync;
+  return Backbone.ajaxSync;
 };
 
 // Override 'Backbone.sync' to default to localSync,
 // the original 'Backbone.sync' is still available in 'Backbone.ajaxSync'
 Backbone.sync = function(method, model, options, error) {
-	return Backbone.getSyncMethod(model).apply(this, [method, model, options, error]);
+  return Backbone.getSyncMethod(model).apply(this, [method, model, options, error]);
 };
 
 })();
