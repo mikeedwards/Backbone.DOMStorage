@@ -1,6 +1,6 @@
 # Backbone localStorage and sessionStorage Adapter v1.0
 
-[![Build Status](https://secure.travis-ci.org/mikeedwards/Backbone.DOMStorage.png?branch=master)](http://travis-ci.org/mikeedwawrds/Backbone.DOMStorage)
+[![Build Status](https://secure.travis-ci.org/mikeedwards/Backbone.DOMStorage.png?branch=master)](http://travis-ci.org/mikeedwards/Backbone.DOMStorage)
 
 Quite simply a localStorage and sessionStorage adapter for Backbone. It's a drop-in replacement for Backbone.Sync() to handle saving to a localStorage or sessionStorage databases.
 
