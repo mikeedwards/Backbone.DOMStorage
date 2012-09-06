@@ -1,16 +1,18 @@
-# Backbone localStorage Adapter v1.0
+# Backbone localStorage and sessionStorage Adapter v1.0
 
-[![Build Status](https://secure.travis-ci.org/jeromegn/Backbone.localStorage.png?branch=master)](http://travis-ci.org/jeromegn/Backbone.localStorage)
+[![Build Status](https://secure.travis-ci.org/mikeedwards/Backbone.DOMStorage.png?branch=master)](http://travis-ci.org/mikeedwawrds/Backbone.DOMStorage)
 
-Quite simply a localStorage adapter for Backbone. It's a drop-in replacement for Backbone.Sync() to handle saving to a localStorage database.
+Quite simply a localStorage and sessionStorage adapter for Backbone. It's a drop-in replacement for Backbone.Sync() to handle saving to a localStorage or sessionStorage databases.
+
+This is a *rough* fork of jeromegn's excellent Backbone.localStorage module.
 
 ## Usage
 
-Include Backbone.localStorage after having included Backbone.js:
+Include Backbone.domStorage after having included Backbone.js:
 
 ```html
 <script type="text/javascript" src="backbone.js"></script>
-<script type="text/javascript" src="backbone.localStorage.js"></script>
+<script type="text/javascript" src="backbone.domStorage.js"></script>
 ```
 
 Create your collections like so:
@@ -18,13 +20,25 @@ Create your collections like so:
 ```javascript
 window.SomeCollection = Backbone.Collection.extend({
   
-  localStorage: new Backbone.LocalStorage("SomeCollection"), // Unique name within your app.
+  localStorage: new Backbone.LocalStorage("SomeLocalCollection"), // Unique name within your app.
   
   // ... everything else is normal.
   
 });
 ```
+
+*or*
+
+```javascript
+window.SomeCollection = Backbone.Collection.extend({
   
+  sessionStorage: new Backbone.SessionStorage("SomeSessionCollection"), // Unique name within your app.
+  
+  // ... everything else is normal.
+  
+});
+```
+
 Feel free to use Backbone as you usually would, this is a drop-in replacement.
 
 ## Contributing
@@ -42,6 +56,7 @@ Have fun!
 
 ## Credits
 
+Thanks to [Jerome Gravel-Niquet](https://github.com/jeromegn) for all the actual hard work.  If you see anything bad here, it's my fault, not his.
 Thanks to [Mark Woodall](https://github.com/llad) for the QUnit tests.
 Thanks to [Martin Häcker](https://github.com/dwt) for the many fixes and the test isolation.
 
