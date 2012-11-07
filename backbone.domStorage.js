@@ -103,7 +103,10 @@ _.extend(Backbone.LocalStorage.prototype, {
 // *localStorage* property, which should be an instance of `Store`.
 // window.Store.sync and Backbone.localSync is deprectated, use Backbone.LocalStorage.sync instead
 Backbone.LocalStorage.sync = window.Store.sync = Backbone.localSync = function(method, model, options, error) {
-  var store = model.localStorage || model.collection.localStorage;
+  var store = model.localStorage || model.collection.localStorage,
+    resp,
+    error = "Record not found",
+    syncDfd = $.Deferred && $.Deferred(); //If $ is having Deferred - use it.
 
   // Backwards compatibility with Backbone <= 0.3.3
   if (typeof options == 'function') {
@@ -112,10 +115,6 @@ Backbone.LocalStorage.sync = window.Store.sync = Backbone.localSync = function(m
       error: error
     };
   }
-
-  var resp;
-  var error = "Record not found";
-  var syncDfd = $.Deferred && $.Deferred(); //If $ is having Deferred - use it. 
 
   try {
 
@@ -218,7 +217,10 @@ _.extend(Backbone.SessionStorage.prototype, {
 // sessionSync delegate to the model or collection's
 // *sessionStorage* property, which should be an instance of `SessionStore`.
 Backbone.SessionStorage.sync = Backbone.sessionSync = function(method, model, options, error) {
-  var store = model.sessionStorage || model.collection.sessionStorage;
+  var store = model.sessionStorage || model.collection.sessionStorage,
+    resp,
+    error = "Record not found",
+    syncDfd = $.Deferred && $.Deferred(); //If $ is having Deferred - use it.
 
   // Backwards compatibility with Backbone <= 0.3.3
   if (typeof options == 'function') {
@@ -228,20 +230,26 @@ Backbone.SessionStorage.sync = Backbone.sessionSync = function(method, model, op
     };
   }
 
-  var resp;
+  try {
 
-  switch (method) {
-    case "read":    resp = model.id != undefined ? store.find(model) : store.findAll(); break;
-    case "create":  resp = store.create(model);                            break;
-    case "update":  resp = store.update(model);                            break;
-    case "delete":  resp = store.destroy(model);                           break;
-  }
+    switch (method) {
+      case "read":    resp = model.id != undefined ? store.find(model) : store.findAll(); break;
+      case "create":  resp = store.create(model);                            break;
+      case "update":  resp = store.update(model);                            break;
+      case "delete":  resp = store.destroy(model);                           break;
+    }
+
+  } catch (e) { error = e; }
 
   if (resp) {
     options.success(resp);
+    if (syncDfd) syncDfd.resolve();
   } else {
-    options.error("Record not found");
+    options.error(error);
+    if (syncDfd) syncDfd.reject();
   }
+
+  return syncDfd && syncDfd.promise();
 };
 
 Backbone.ajaxSync = Backbone.sync;
