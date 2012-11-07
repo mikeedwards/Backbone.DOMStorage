@@ -31,7 +31,13 @@ require(["backbone"], function(Backbone) {
 
 	module("localStorage on collections", {
 		setup: function() {
-			window.localStorage.clear();
+			var storage;
+			if (window.privateLocalStorage) {
+				storage = window.privateLocalStorage;
+			} else {
+				storage = localStorage;
+			}
+			storage.clear();
 			library = new LibraryLocal();
 		}
 	});
@@ -68,7 +74,13 @@ require(["backbone"], function(Backbone) {
 
 	module("sessionStorage on collections", {
 		setup: function() {
-			window.sessionStorage.clear();
+			var storage;
+			if (window.privateSessionStorage) {
+				storage = window.privateSessionStorage;
+			} else {
+				storage = sessionStorage;
+			}
+			storage.clear();
 			library = new LibrarySession();
 		}
 	});

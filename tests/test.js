@@ -19,12 +19,18 @@ $(document).ready(function() {
       length : 123
     },
     libraryLocal = null,
-    librarySession = null;
+    librarySession = null,
+    storage;
     
   module("localStorage on collections", {
       setup: function() {
-          window.localStorage.clear();
-          libraryLocal = new LibraryLocal();
+        if (window.privateLocalStorage) {
+          storage = window.privateLocalStorage;
+        } else {
+          storage = window.localStorage;
+        }
+        storage.clear();
+        libraryLocal = new LibraryLocal();
       }
   });
   
@@ -114,7 +120,7 @@ $(document).ready(function() {
   
     test("should not try to load items from localstorage if they are not there anymore", function() {
         libraryLocal.create(attrs);
-        localStorage.clear();
+        storage.clear();
         libraryLocal.fetch();
         equals(0, libraryLocal.length);
     });
@@ -145,7 +151,7 @@ $(document).ready(function() {
 
     module("localStorage on models", {
     setup: function() {
-            window.localStorage.clear();
+            storage.clear();
       book = new Book();
     }
     });
@@ -209,8 +215,13 @@ $(document).ready(function() {
 
   module("sessionStorage on collections", {
       setup: function() {
-          window.sessionStorage.clear();
-          librarySession = new LibrarySession();
+        if (window.privateSessionStorage) {
+          storage = window.privateSessionStorage;
+        } else {
+          storage = window.sessionStorage;
+        }
+        storage.clear();
+        librarySession = new LibrarySession();
       }
   });
   
@@ -300,7 +311,7 @@ $(document).ready(function() {
   
     test("should not try to load items from localstorage if they are not there anymore", function() {
         librarySession.create(attrs);
-        sessionStorage.clear();
+        storage.clear();
         librarySession.fetch();
         equals(0, librarySession.length);
     });
@@ -332,7 +343,7 @@ $(document).ready(function() {
   
     module("sessionStorage on models", {
     setup: function() {
-            window.sessionStorage.clear();
+            storage.clear();
       bookSession = new BookSession();
     }
     });
