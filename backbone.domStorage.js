@@ -20,9 +20,9 @@
     storageAvailable = false;
   }
 
-  if (typeof window.localStorage === 'undefined'  
-    || typeof window.sessionStorage === 'undefined'
-    || !storageAvailable) (function () {
+  if (!storageAvailable
+    || typeof window.localStorage === 'undefined'
+    || typeof window.sessionStorage === 'undefined') (function () {
 
     var Storage = function (type) {
       function createCookie(name, value, days) {
